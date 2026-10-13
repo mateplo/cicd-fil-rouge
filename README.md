@@ -102,3 +102,9 @@ Le push est refusé pour deux raisons :
 
 - le commit n'est pas signé avec la clé SSH ;
 - c'est un push direct sur `main` et non une pull request.
+
+### Capture
+
+![Pull request bloquée par le check de test en échec](screenshots/image.png)
+
+Le merge est bien bloqué : le ruleset marque le job de test comme obligatoire, et tant qu'il échoue, la pull request ne peut pas être fusionnée.
