@@ -1,5 +1,7 @@
 # Intégration continue de TaskFlow : lint (ruff) et tests (pytest).
-# Les deux jobs sont indépendants et tournent en parallèle.
+# Les jobs lint et test sont indépendants et tournent en parallèle.
+# Les tests sont exécutés sur une matrice de versions de Python ; le job
+# « Tests (pytest) » agrège leurs résultats pour fournir un check stable au ruleset.
 name: CI
 
 on:
@@ -10,6 +12,12 @@ on:
 permissions:
   contents: read
 
+# Un seul run à la fois par branche/PR : un nouveau push annule le run en cours,
+# ce qui évite de gaspiller des minutes sur un commit déjà obsolète.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     name: Lint (ruff)
@@ -19,8 +27,12 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+          # Cache pip invalidé dès que l'un des deux fichiers de dépendances change
+          # (requirements-dev.txt inclut requirements.txt).
           cache: pip
-          cache-dependency-path: requirements-dev.txt
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
       - name: Installer les dépendances
         run: pip install -r requirements-dev.txt
       - name: Vérifier le lint
@@ -29,16 +41,44 @@ jobs:
         run: ruff format --check .
 
   test:
-    name: Tests (pytest)
+    name: Tests (pytest, Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    strategy:
+      # On veut voir le résultat de chaque version, pas seulement la première en échec.
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: requirements-dev.txt
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
       - name: Installer les dépendances
         run: pip install -r requirements-dev.txt
       - name: Lancer les tests
-        run: pytest -v
+        run: pytest -v --junitxml=reports/junit-py${{ matrix.python-version }}.xml
+      - name: Publier le rapport de tests
+        # Le rapport est publié même si les tests échouent : c'est justement là qu'il sert.
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rapport-tests-py${{ matrix.python-version }}
+          path: reports/
+          retention-days: 14
+
+  # Job de synthèse : un seul check « Tests (pytest) » à exiger dans le ruleset,
+  # quel que soit le nombre de versions dans la matrice.
+  test-summary:
+    name: Tests (synthèse)
+    runs-on: ubuntu-latest
+    needs: test
+    if: always()
+    steps:
+      - name: Vérifier que toutes les versions ont réussi
+        run: |
+          echo "Résultat de la matrice : ${{ needs.test.result }}"
+          test "${{ needs.test.result }}" = "success"
