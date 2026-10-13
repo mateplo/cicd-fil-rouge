@@ -57,10 +57,48 @@ docker run --rm -p 8000:8000 taskflow
 
 ## Équipe
 
-<!-- Lab J1 : remplacez par les noms du binôme -->
-- À compléter
+- Matteo MENCUCCINI
+- Sabri ABID
 
 ## Gouvernance du dépôt
 
-<!-- Lab J1 : listez les règles activées sur main, pourquoi chacune, et ajoutez la capture du push refusé -->
-À compléter.
+### Règles activées sur `main`
+
+| Règle | Pourquoi |
+| --- | --- |
+| Modifications uniquement via pull request | Aucun push direct sur `main` : chaque changement passe par une PR, donc par une relecture et par la CI avant d'être intégré. |
+| Commits signés obligatoires | Garantit que l'auteur d'un commit est bien celui qu'il prétend être (signature SSH vérifiée par GitHub). |
+| Relecture par les propriétaires du code | Le fichier `.github/CODEOWNERS` désigne les relecteurs requis sur chaque PR. |
+
+### Capture du push refusé
+
+Tentative de push direct sur `main` avec un commit non signé :
+
+```text
+❯ git push
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 10 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 344 bytes | 344.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
+remote: error: GH013: Repository rule violations found for refs/heads/main.
+remote: Review all repository rules at https://github.com/mateplo/cicd-fil-rouge/rules?ref=refs%2Fheads%2Fmain
+remote:
+remote: - Changes must be made through a pull request.
+remote:
+remote: - Commits must have verified signatures.
+remote:   Found 1 violation:
+remote:
+remote:   69e6542371397d150fd530e96ab7ba5e8a7b6754
+remote:
+To github.com:mateplo/cicd-fil-rouge.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'github.com:mateplo/cicd-fil-rouge.git'
+```
+
+Le push est refusé pour deux raisons :
+
+- le commit n'est pas signé avec la clé SSH ;
+- c'est un push direct sur `main` et non une pull request.
