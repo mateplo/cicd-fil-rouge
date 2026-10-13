@@ -103,8 +103,20 @@ Le push est refusé pour deux raisons :
 - le commit n'est pas signé avec la clé SSH ;
 - c'est un push direct sur `main` et non une pull request.
 
-### Capture
+### Capture Pull request bloquée
 
 ![Pull request bloquée par le check de test en échec](screenshots/image.png)
 
 Le merge est bien bloqué : le ruleset marque le job de test comme obligatoire, et tant qu'il échoue, la pull request ne peut pas être fusionnée.
+
+
+### Explication pipeline rapide
+
+La PR etait bloquée car le job de test à été remplacé par la matrice de trois jobs. Nous avons créé un job de synthèse qui remplace le job de test côté ruleset, et qui est a renseigner pour permettre a la CI de bien s'executer (avec un test existant vu que l'ancien n'existait plus)
+
+Temps avec cache :
+
+![alt text](screenshots/image2.png)
+
+Temps sans cache :
+
