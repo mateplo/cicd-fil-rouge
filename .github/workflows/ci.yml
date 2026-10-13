@@ -41,4 +41,4 @@ jobs:
       - name: Installer les dépendances
         run: pip install -r requirements-dev.txt
       - name: Lancer les tests
-        run: pytest --vraimentpaslabonnecommande
+        run: pytest -v
