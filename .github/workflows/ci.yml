@@ -1,7 +1,7 @@
 # Intégration continue de TaskFlow : lint (ruff) et tests (pytest).
 # Les jobs lint et test sont indépendants et tournent en parallèle.
 # Les tests sont exécutés sur une matrice de versions de Python ; le job
-# « Tests (pytest) » agrège leurs résultats pour fournir un check stable au ruleset.
+# « CI OK » agrège lint et tests pour fournir un check stable au ruleset.
 name: CI
 
 on:
@@ -70,15 +70,17 @@ jobs:
           path: reports/
           retention-days: 14
 
-  # Job de synthèse : un seul check « Tests (pytest) » à exiger dans le ruleset,
-  # quel que soit le nombre de versions dans la matrice.
-  test-summary:
-    name: Tests (synthèse)
+  # Job de synthèse : un seul check « CI OK » à exiger dans le ruleset,
+  # quel que soit le nombre de jobs et de versions dans la matrice.
+  ci-ok:
+    name: CI OK
     runs-on: ubuntu-latest
-    needs: test
+    needs: [lint, test]
     if: always()
     steps:
-      - name: Vérifier que toutes les versions ont réussi
+      - name: Vérifier que le lint et toutes les versions ont réussi
         run: |
-          echo "Résultat de la matrice : ${{ needs.test.result }}"
+          echo "Lint  : ${{ needs.lint.result }}"
+          echo "Tests : ${{ needs.test.result }}"
+          test "${{ needs.lint.result }}" = "success"
           test "${{ needs.test.result }}" = "success"
