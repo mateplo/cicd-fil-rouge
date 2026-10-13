@@ -73,7 +73,7 @@ jobs:
   # Job de synthèse : un seul check « Tests (pytest) » à exiger dans le ruleset,
   # quel que soit le nombre de versions dans la matrice.
   test-summary:
-    name: Tests (pytest)
+    name: Tests (synthèse)
     runs-on: ubuntu-latest
     needs: test
     if: always()
