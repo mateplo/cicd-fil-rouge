@@ -1,4 +1,31 @@
-modif push factice
+# Gouvernance du dépôt
+
+Erreur capturée : 
+❯ git push  
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 10 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 344 bytes | 344.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
+remote: error: GH013: Repository rule violations found for refs/heads/main.
+remote: Review all repository rules at https://github.com/mateplo/cicd-fil-rouge/rules?ref=refs%2Fheads%2Fmain
+remote: 
+remote: - Changes must be made through a pull request.
+remote: 
+remote: - Commits must have verified signatures.
+remote:   Found 1 violation:
+remote: 
+remote:   69e6542371397d150fd530e96ab7ba5e8a7b6754
+remote: 
+To github.com:mateplo/cicd-fil-rouge.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'github.com:mateplo/cicd-fil-rouge.git'
+
+On ne peut pas push pour deux raisons ici :
+- Le commit n'es pas signé avec la clé ssh
+- c'est un push et non une PR
 
 # TaskFlow — dépôt fil rouge CI/CD
 
