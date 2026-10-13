@@ -1,5 +1,7 @@
 # TaskFlow — dépôt fil rouge CI/CD
 
+[![CI](https://github.com/mateplo/cicd-fil-rouge/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mateplo/cicd-fil-rouge/actions/workflows/ci.yml)
+
 TaskFlow est une petite API de gestion de tâches écrite en Python avec FastAPI.
 C'est le projet fil rouge du module CI/CD (Mastère DevOps M1, Sup de Vinci) :
 pendant trois jours, vous allez construire autour d'elle un pipeline complet
@@ -103,8 +105,23 @@ Le push est refusé pour deux raisons :
 - le commit n'est pas signé avec la clé SSH ;
 - c'est un push direct sur `main` et non une pull request.
 
-### Capture
+### Capture Pull request bloquée
 
 ![Pull request bloquée par le check de test en échec](screenshots/image.png)
 
 Le merge est bien bloqué : le ruleset marque le job de test comme obligatoire, et tant qu'il échoue, la pull request ne peut pas être fusionnée.
+
+
+### Explication pipeline rapide
+
+La PR etait bloquée car le job de test à été remplacé par la matrice de trois jobs. Nous avons créé un job de synthèse qui remplace le job de test côté ruleset, et qui est a renseigner pour permettre a la CI de bien s'executer (avec un test existant vu que l'ancien n'existait plus)
+
+Temps avec cache (27s) :
+
+![alt text](screenshots/image2.png)
+
+Temps sans cache (29s) :
+
+![alt text](screenshots/image3.png)
+
+Sur un aussi petit projet, on peut difficilement voir l'intérêt du cache mais il est bien présent
